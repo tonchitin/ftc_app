@@ -14,7 +14,11 @@ public class TeleOpMode extends OpMode
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
+    private DcMotor leftIntake = null;
+    private DcMotor rightIntake = null;
 
+    private final double INTAKE_POW = 1.0;
+    private final double SPIT_POW = -1.0;
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -25,8 +29,14 @@ public class TeleOpMode extends OpMode
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
 
+        leftIntake  = hardwareMap.get(DcMotor.class, "left_intake");
+        rightIntake = hardwareMap.get(DcMotor.class, "right_intake");
+
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
+
+        leftIntake.setDirection(DcMotor.Direction.FORWARD);
+        rightIntake.setDirection(DcMotor.Direction.REVERSE);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -60,8 +70,22 @@ public class TeleOpMode extends OpMode
 
        driveArcade(throttle, turn);
 
+       if (gamepad2.a){
+           intake();
+       }
+
+       if (gamepad2.b){
+           spit();
+       }
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
+    }
+
+    /*
+     * Code to run ONCE after the driver hits STOP
+     */
+    @Override
+    public void stop() {
     }
 
     public void drive(double leftPow, double rightPow) {
@@ -73,11 +97,17 @@ public class TeleOpMode extends OpMode
         drive(throttle + turn, throttle - turn);
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
-    @Override
-    public void stop() {
+    public void driveIntake(double pow) {
+        leftIntake.setPower(pow);
+        rightIntake.setPower(pow);
+    }
+
+    public void intake() {
+        driveIntake(INTAKE_POW);
+    }
+
+    public void spit() {
+        driveIntake(SPIT_POW);
     }
 
 }
